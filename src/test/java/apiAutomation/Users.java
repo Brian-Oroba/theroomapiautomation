@@ -1,6 +1,7 @@
 package apiAutomation;
 
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -17,9 +18,10 @@ public class Users {
     private static Response response;
     private static String BASE_URL = "https://jsonplaceholder.typicode.com";
     private List<Map<String, String>> usersList;
+    private String name;
 
     @Given("You want to view users")
-    public void viewTodos() {
+    public void viewUsers() {
         RestAssured.baseURI = BASE_URL;
         RequestSpecification request = RestAssured.given().log().all();
 
@@ -31,5 +33,19 @@ public class Users {
         List<Map<String, String>> users = JsonPath.from(todosJson).get("data");
         Assert.assertTrue(users.size() > 0);
         usersList = users;
+    }
+
+    @Then ("I should search users name")
+    public void searchUsers() {
+        RestAssured.baseURI = BASE_URL;
+        RequestSpecification request =RestAssured.given().log().all();
+        //String name = "Username "+ name;
+        request.param("name", name);
+
+        request.get("/users");
+        response = request.get("/users?status=true&search=");
+        String userJson = response.asString();
+
+        List<Map<String, String>> users = JsonPath.from(userJson).get("data");
     }
 }
